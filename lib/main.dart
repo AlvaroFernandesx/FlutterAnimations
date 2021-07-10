@@ -28,6 +28,7 @@ class _HomeState extends State<Home> {
   List<String> listNames = ["Helio", "Alvaro", "Jose"];
 
   double _currentSliderValue = 0.4;
+  ScrollController draggableController;
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +65,6 @@ class _HomeState extends State<Home> {
             onNotification: (notification) {
               setState(() {
                 _currentSliderValue = notification.extent;
-                print("${notification.extent}");
               });
             },
             child: DraggableScrollableSheet(
@@ -72,15 +72,23 @@ class _HomeState extends State<Home> {
                 minChildSize: 0.40,
                 builder:
                     (BuildContext context, ScrollController scrollcontroller) {
+                  if (scrollcontroller.hasClients) {
+                    draggableController = scrollcontroller;
+                  }
+
                   return SingleChildScrollView(
                       controller: scrollcontroller,
                       child: Column(
                         children: [
-                          AnimatedContainer(
-                            duration: Duration(seconds: 2),
-                            child: Container(
-                              height: (_currentSliderValue - 0.4) * 100,
-                              color: Colors.grey,
+                          AnimatedOpacity(
+                            duration: Duration(milliseconds: 200),
+                            opacity: _currentSliderValue == 1 ? 1 : 0,
+                            child: AnimatedContainer(
+                              duration: Duration.zero,
+                              child: Container(
+                                height: _currentSliderValue == 1 ? 120 : 0,
+                                color: Colors.grey,
+                              ),
                             ),
                           ),
                           Container(
