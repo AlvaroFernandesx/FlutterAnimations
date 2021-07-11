@@ -30,8 +30,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
   double _currentSliderValue = 0.4;
   ScrollController draggableController;
-  bool showAppBar = true;
-  double _currentOpacity = 0;
+  bool showAppBar = false;
 
   AnimationController _controllerAppBar;
 
@@ -59,18 +58,16 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       body: AnimatedBuilder(
         animation: _controllerAppBar,
         builder: (context, child) => Stack(children: <Widget>[
-          AnimatedOpacity(
-            opacity: _currentOpacity,
-            duration: Duration(seconds: 0),
+          Transform.translate(
+            offset: Offset(0, -_controllerAppBar.value * 64),
             child: Container(
-              height: 100.0,
-              child: CupertinoNavigationBar(
-                  backgroundColor: Colors.black,
-                  middle: Text("Gambeta mlk doido",
-                      style: TextStyle(
-                        color: Colors.white,
-                      ))),
-            ),
+                height: 100.0,
+                child: AppBar(
+                  title: Text('GAMBETA MLK DOIDO'),
+                  leading: Icon(
+                    Icons.arrow_back,
+                  ),
+                )),
           ),
           Center(
             child: TweenAnimationBuilder(
@@ -100,15 +97,14 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             // ignore: missing_return
             onNotification: (notification) {
               setState(() {
-                print(notification.extent);
-                if (notification.extent > 0.8) {
+                if (notification.extent > 0.5) {
                   showAppBar = true;
-                  _currentOpacity = 1;
+                  _controllerAppBar.forward();
                 }
-                if (notification.extent < 0.8) {
+
+                if (notification.extent < 1) {
                   showAppBar = false;
-                  _currentOpacity = 0;
-                  // _controllerAppBar.reverse();
+                  _controllerAppBar.reverse();
                 }
                 _currentSliderValue = notification.extent;
               });
@@ -116,7 +112,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             child: DraggableScrollableSheet(
                 initialChildSize: 0.40,
                 minChildSize: 0.40,
-                maxChildSize: 0.9,
                 builder:
                     (BuildContext context, ScrollController scrollcontroller) {
                   if (scrollcontroller.hasClients) {
@@ -127,6 +122,20 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                       controller: scrollcontroller,
                       child: Column(
                         children: [
+                          // AnimatedOpacity(
+                          // duration: Duration(milliseconds: 200),
+                          // opacity: _currentSliderValue == 1 ? 1 : 0,
+                          Visibility(
+                            visible: _currentSliderValue > 8 ? true : false,
+                            child: AnimatedContainer(
+                              duration: Duration.zero,
+                              child: Container(
+                                height: _currentSliderValue > 8 ? 120 : 0,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                          // ),
                           Container(
                             height: 120,
                             width: MediaQuery.of(context).size.width,
@@ -143,30 +152,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                             height: 120,
                             width: MediaQuery.of(context).size.width,
                             color: Colors.green,
-                            child: Text("Hello World"),
-                          ),
-                          Container(
-                            height: 120,
-                            width: MediaQuery.of(context).size.width,
-                            color: Colors.pink,
-                            child: Text("Hello World"),
-                          ),
-                          Container(
-                            height: 120,
-                            width: MediaQuery.of(context).size.width,
-                            color: Colors.cyan,
-                            child: Text("Hello World"),
-                          ),
-                          Container(
-                            height: 120,
-                            width: MediaQuery.of(context).size.width,
-                            color: Colors.orange,
-                            child: Text("Hello World"),
-                          ),
-                          Container(
-                            height: 120,
-                            width: MediaQuery.of(context).size.width,
-                            color: Colors.teal,
                             child: Text("Hello World"),
                           ),
                           Container(
