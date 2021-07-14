@@ -1,9 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 void main() => runApp(const MyApp());
 
-/// This is the main application widget.
 class MyApp extends StatelessWidget {
   const MyApp({Key key}) : super(key: key);
 
@@ -11,7 +10,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        // appBar: AppBar(title: const Text(_title)),
         body: const Home(),
       ),
     );
@@ -25,299 +23,205 @@ class Home extends StatefulWidget {
   _HomeState createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
-  List<String> listNames = ["Helio", "Alvaro", "Jose"];
+class _HomeState extends State<Home> {
+  // List<Color> colors = [
+  //   Colors.amberAccent,
+  //   Colors.blue,
+  //   Colors.green,
+  //   Colors.pink,
+  //   Colors.cyan,
+  //   Colors.orange,
+  //   Colors.teal,
+  //   Colors.deepOrange,
+  //   Colors.orange,
+  //   Colors.teal,
+  //   Colors.deepOrange,
+  // ];
+
+  List<Container> containers = [
+    Container(
+      height: 120,
+      width: 420,
+      color: Colors.yellow,
+    ),
+    Container(
+      height: 120,
+      width: 420,
+      color: Colors.red,
+    ),
+    Container(
+      height: 120,
+      width: 420,
+      color: Colors.green,
+    ),
+    Container(
+      height: 120,
+      width: 420,
+      color: Colors.pink,
+    ),
+    Container(
+      height: 120,
+      width: 420,
+      color: Colors.cyan,
+    ),
+    Container(
+      height: 120,
+      width: 420,
+      color: Colors.orange,
+    ),
+    Container(
+      height: 120,
+      width: 420,
+      color: Colors.blue,
+    ),
+    Container(
+      height: 120,
+      width: 420,
+      color: Colors.grey,
+    ),
+    Container(
+      height: 120,
+      width: 420,
+      color: Colors.cyan,
+    ),
+    Container(
+      height: 120,
+      width: 420,
+      color: Colors.orange,
+    ),
+    Container(
+      height: 120,
+      width: 420,
+      color: Colors.blue,
+    ),
+    Container(
+      height: 120,
+      width: 420,
+      color: Colors.grey,
+    ),
+  ];
+
+  PanelController _pc = new PanelController();
 
   double _currentSliderValue = 0.4;
-  ScrollController draggableController;
-  bool showAppBar = true;
-  double _currentOpacity = 0;
+  final key = GlobalKey<AnimatedListState>();
 
-  AnimationController _controllerAppBar;
+  void close() {
+    _pc.close();
+    if (containers.length == 13) {
+      containers.removeAt(0);
+    }
+  }
 
-  @override
-  void initState() {
-    super.initState();
-    _controllerAppBar = AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: 300),
-    );
+  void open() {
+    _pc.open();
+    if (containers.length < 13) {
+      containers.insert(
+        0,
+        Container(
+          height: 120,
+          width: 420,
+          color: Colors.grey,
+        ),
+      );
+    }
+  }
+
+  void appendMenu() {
+    setState(() {
+      containers.insert(
+          3,
+          Container(
+            height: 120,
+            width: 120,
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      height: 60,
+                      width: 60,
+                      color: Colors.red,
+                    ),
+                    Container(
+                      height: 60,
+                      width: 60,
+                      color: Colors.brown,
+                    )
+                  ],
+                ),
+                Row(
+                  children: [
+                    Container(
+                      height: 60,
+                      width: 60,
+                      color: Colors.blue,
+                    ),
+                    Container(
+                      height: 60,
+                      width: 60,
+                      color: Colors.green,
+                    )
+                  ],
+                ),
+              ],
+            ),
+          ));
+    });
+
+    _pc.animatePanelToPosition(1);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: showAppBar
-      //     ? CupertinoNavigationBar(
-      //         backgroundColor: Theme.of(context).backgroundColor,
-      //         middle: Text("GAMBETA MLK DOIDO",
-      //             style: TextStyle(
-      //               color: Theme.of(context).textTheme.headline6.color,
-      //             )))
-      //     : null,
-      backgroundColor: Colors.white,
-      body: AnimatedBuilder(
-        animation: _controllerAppBar,
-        builder: (context, child) => Stack(children: <Widget>[
-          AnimatedOpacity(
-            opacity: _currentOpacity,
-            duration: Duration(seconds: 0),
-            child: Container(
-              height: 100.0,
-              child: CupertinoNavigationBar(
-                  backgroundColor: Colors.black,
-                  middle: Text("Gambeta mlk doido",
-                      style: TextStyle(
-                        color: Colors.white,
-                      ))),
-            ),
-          ),
-          Center(
-            child: TweenAnimationBuilder(
-              builder: (BuildContext context, Size size, Widget child) {
-                return Container(
-                  height: size.height,
-                  width: size.width,
-                  decoration: BoxDecoration(
-                      color: Colors.red,
-                      border: Border.all(),
-                      borderRadius: BorderRadius.all(Radius.circular(20))),
-                );
+        floatingActionButton:
+            FloatingActionButton(onPressed: () => appendMenu()),
+        backgroundColor: Colors.black,
+        body: SlidingUpPanel(
+          snapPoint: 0.2,
+          color: Colors.transparent,
+          onPanelOpened: open,
+          onPanelClosed: close,
+          onPanelSlide: (value) {
+            setState(() {
+              _currentSliderValue = value;
+            });
+          },
+          minHeight: MediaQuery.of(context).size.height * 0.4,
+          controller: _pc,
+          maxHeight: MediaQuery.of(context).size.height,
+          panelBuilder: (scroll) {
+            return AnimatedList(
+              key: key,
+              controller: scroll,
+              initialItemCount: containers.length,
+              itemBuilder: (BuildContext context, int index,
+                  Animation<double> animation) {
+                return buildItem(index, animation);
               },
-              tween: SizeTween(
-                  begin: MediaQuery.of(context).size,
-                  end: Size(
-                      MediaQuery.of(context).size.width -
-                          (MediaQuery.of(context).size.width *
-                              ((_currentSliderValue - 0.4) * 0.4)),
-                      MediaQuery.of(context).size.height -
-                          (MediaQuery.of(context).size.height *
-                              ((_currentSliderValue - 0.4) * 0.4)))),
-              duration: Duration.zero,
-            ),
+            );
+          },
+          body: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                height: MediaQuery.of(context).size.height -
+                    (MediaQuery.of(context).size.height *
+                        ((_currentSliderValue - 0.4) * 0.4)),
+                width: MediaQuery.of(context).size.width -
+                    (MediaQuery.of(context).size.width *
+                        ((_currentSliderValue - 0.4) * 0.4)),
+                decoration: BoxDecoration(
+                    color: Colors.red,
+                    border: Border.all(),
+                    borderRadius: BorderRadius.all(Radius.circular(20))),
+              ),
+            ],
           ),
-          NotificationListener<DraggableScrollableNotification>(
-            // ignore: missing_return
-            onNotification: (notification) {
-              setState(() {
-                print(notification.extent);
-                if (notification.extent > 0.8) {
-                  showAppBar = true;
-                  _currentOpacity = 1;
-                }
-                if (notification.extent < 0.8) {
-                  showAppBar = false;
-                  _currentOpacity = 0;
-                  // _controllerAppBar.reverse();
-                }
-                _currentSliderValue = notification.extent;
-              });
-            },
-            child: DraggableScrollableSheet(
-                initialChildSize: 0.40,
-                minChildSize: 0.40,
-                maxChildSize: 0.9,
-                builder:
-                    (BuildContext context, ScrollController scrollcontroller) {
-                  if (scrollcontroller.hasClients) {
-                    draggableController = scrollcontroller;
-                  }
-
-                  return SingleChildScrollView(
-                      controller: scrollcontroller,
-                      child: Column(
-                        children: [
-                          Container(
-                            height: 120,
-                            width: MediaQuery.of(context).size.width,
-                            color: Colors.amberAccent,
-                            child: Text("Hello World"),
-                          ),
-                          Container(
-                            height: 120,
-                            width: MediaQuery.of(context).size.width,
-                            color: Colors.blue,
-                            child: Text("Hello World"),
-                          ),
-                          Container(
-                            height: 120,
-                            width: MediaQuery.of(context).size.width,
-                            color: Colors.green,
-                            child: Text("Hello World"),
-                          ),
-                          Container(
-                            height: 120,
-                            width: MediaQuery.of(context).size.width,
-                            color: Colors.pink,
-                            child: Text("Hello World"),
-                          ),
-                          Container(
-                            height: 120,
-                            width: MediaQuery.of(context).size.width,
-                            color: Colors.cyan,
-                            child: Text("Hello World"),
-                          ),
-                          Container(
-                            height: 120,
-                            width: MediaQuery.of(context).size.width,
-                            color: Colors.orange,
-                            child: Text("Hello World"),
-                          ),
-                          Container(
-                            height: 120,
-                            width: MediaQuery.of(context).size.width,
-                            color: Colors.teal,
-                            child: Text("Hello World"),
-                          ),
-                          Container(
-                            height: 120,
-                            width: MediaQuery.of(context).size.width,
-                            color: Colors.pink,
-                            child: Text("Hello World"),
-                          ),
-                          Container(
-                            height: 120,
-                            width: MediaQuery.of(context).size.width,
-                            color: Colors.cyan,
-                            child: Text("Hello World"),
-                          ),
-                          Container(
-                            height: 120,
-                            width: MediaQuery.of(context).size.width,
-                            color: Colors.orange,
-                            child: Text("Hello World"),
-                          ),
-                          Container(
-                            height: 120,
-                            width: MediaQuery.of(context).size.width,
-                            color: Colors.teal,
-                            child: Text("Hello World"),
-                          ),
-                        ],
-                      ));
-                }),
-          ),
-        ]),
-      ),
-    );
+        ));
   }
+
+  Widget buildItem(int index, Animation<double> animation) =>
+      SizeTransition(sizeFactor: animation, child: containers[index]);
 }
-//         )
-//       body: Stack(
-//         children: [
-        //   Center(
-        //     child: TweenAnimationBuilder(
-        //       builder: (BuildContext context, Size size, Widget child) {
-        //         return Container(
-        //           height: size.height,
-        //           width: size.width,
-        //           decoration: BoxDecoration(
-        //               color: Colors.red,
-        //               border: Border.all(),
-        //               borderRadius: BorderRadius.all(Radius.circular(20))),
-        //         );
-        //       },
-        //       tween: SizeTween(
-        //           begin: MediaQuery.of(context).size,
-        //           end: Size(
-        //               MediaQuery.of(context).size.width -
-        //                   (MediaQuery.of(context).size.width *
-        //                       ((_currentSliderValue - 0.4) * 0.4)),
-        //               MediaQuery.of(context).size.height -
-        //                   (MediaQuery.of(context).size.height *
-        //                       ((_currentSliderValue - 0.4) * 0.4)))),
-        //       duration: Duration.zero,
-        //     ),
-        //   ),
-        //   NotificationListener<DraggableScrollableNotification>(
-        //     // ignore: missing_return
-        //     onNotification: (notification) {
-        //       setState(() {
-        //         if (notification.extent == 1) {
-        //           showAppBar = true;
-        //         }
-
-        //         if (notification.extent < 1) {
-        //           showAppBar = false;
-        //         }
-        //         _currentSliderValue = notification.extent;
-        //       });
-        //     },
-        //     child: DraggableScrollableSheet(
-        //         initialChildSize: 0.40,
-        //         minChildSize: 0.40,
-        //         builder:
-        //             (BuildContext context, ScrollController scrollcontroller) {
-        //           if (scrollcontroller.hasClients) {
-        //             draggableController = scrollcontroller;
-        //           }
-
-        //           return SingleChildScrollView(
-        //               controller: scrollcontroller,
-        //               child: Column(
-        //                 children: [
-        //                   // AnimatedOpacity(
-        //                   // duration: Duration(milliseconds: 200),
-        //                   // opacity: _currentSliderValue == 1 ? 1 : 0,
-        //                   Visibility(
-        //                     visible: _currentSliderValue > 8 ? true : false,
-        //                     child: AnimatedContainer(
-        //                       duration: Duration.zero,
-        //                       child: Container(
-        //                         height: _currentSliderValue > 8 ? 120 : 0,
-        //                         color: Colors.grey,
-        //                       ),
-        //                     ),
-        //                   ),
-        //                   // ),
-        //                   Container(
-        //                     height: 120,
-        //                     width: MediaQuery.of(context).size.width,
-        //                     color: Colors.amberAccent,
-        //                     child: Text("Hello World"),
-        //                   ),
-        //                   Container(
-        //                     height: 120,
-        //                     width: MediaQuery.of(context).size.width,
-        //                     color: Colors.blue,
-        //                     child: Text("Hello World"),
-        //                   ),
-        //                   Container(
-        //                     height: 120,
-        //                     width: MediaQuery.of(context).size.width,
-        //                     color: Colors.green,
-        //                     child: Text("Hello World"),
-        //                   ),
-        //                   Container(
-        //                     height: 120,
-        //                     width: MediaQuery.of(context).size.width,
-        //                     color: Colors.pink,
-        //                     child: Text("Hello World"),
-        //                   ),
-        //                   Container(
-        //                     height: 120,
-        //                     width: MediaQuery.of(context).size.width,
-        //                     color: Colors.cyan,
-        //                     child: Text("Hello World"),
-        //                   ),
-        //                   Container(
-        //                     height: 120,
-        //                     width: MediaQuery.of(context).size.width,
-        //                     color: Colors.orange,
-        //                     child: Text("Hello World"),
-        //                   ),
-        //                   Container(
-        //                     height: 120,
-        //                     width: MediaQuery.of(context).size.width,
-        //                     color: Colors.teal,
-        //                     child: Text("Hello World"),
-        //                   ),
-        //                 ],
-        //               ));
-        //         }),
-        //   ),
-        // ],
-//       ),
-//     );
-//   }
-// }
